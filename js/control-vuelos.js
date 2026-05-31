@@ -83,11 +83,14 @@ function formatearFecha(fechaISO) {
 }
 
 function obtenerHoraUTC() {
-    const ahora = new Date();
-    const horas = String(ahora.getUTCHours()).padStart(2, '0');
-    const minutos = String(ahora.getUTCMinutes()).padStart(2, '0');
-    const segundos = String(ahora.getUTCSeconds()).padStart(2, '0');
-    return `${horas}:${minutos}:${segundos}Z`;
+    const fechaActual = new Date();
+    const horaMilitar = new Intl.DateTimeFormat('es-CO', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+    return horaMilitar.format(fechaActual) + 'Z';
 }
 
 function crearTarjeta(lanzamiento) {
@@ -116,10 +119,10 @@ function crearTarjeta(lanzamiento) {
 
     // Añadir eventos hover
     article.addEventListener('mouseover', () => {
-        article.classList.add('organism-launch-card--hover');
+        article.classList.add('is-hovered');
     });
     article.addEventListener('mouseout', () => {
-        article.classList.remove('organism-launch-card--hover');
+        article.classList.remove('is-hovered');
     });
 
     return article;
@@ -148,6 +151,23 @@ function renderizarTarjetas() {
 
     contadorVisibles.textContent = `${lanzamientosFiltrados.length} REGISTROS`;
 }
+
+function actualizarEstadisticas() {
+    const pendientes = lanzamientos.filter(l => l.estado === 'pendiente').length;
+    const lanzados = lanzamientos.filter(l => l.estado === 'lanzado').length;
+    const cancelados = lanzamientos.filter(l => l.estado === 'cancelado').length;
+    const total = lanzamientos.length;
+
+    statPendientes.textContent = pendientes;
+    statLanzados.textContent = lanzados;
+    statCancelados.textContent = cancelados;
+    statTotal.textContent = total;
+}
+
+function actualizarContador() {
+    contadorLanzamientos.textContent = lanzamientos.length;
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  SECCIÓN 3 — RENDERIZADO DE TARJETAS
@@ -396,10 +416,8 @@ function configurarEventosFiltros() {
 
 function iniciarRelojYMonitoreo() {
     setInterval(() => {
-        // Tarea A: Actualizar reloj UTC
         relojPrincipal.textContent = obtenerHoraUTC();
 
-        // Tarea B: Detectar lanzamientos automáticos
         const ahora = new Date();
         let huboDeteccion = false;
 
@@ -434,23 +452,6 @@ function iniciarRelojYMonitoreo() {
 //    · #stat-cancelados  → contador de lanzamientos cancelados
 //    · #stat-total       → total de registros en el sistema
 // ─────────────────────────────────────────────────────────────────────────────
-
-function actualizarEstadisticas() {
-    const pendientes = lanzamientos.filter(l => l.estado === 'pendiente').length;
-    const lanzados = lanzamientos.filter(l => l.estado === 'lanzado').length;
-    const cancelados = lanzamientos.filter(l => l.estado === 'cancelado').length;
-    const total = lanzamientos.length;
-
-    statPendientes.textContent = pendientes;
-    statLanzados.textContent = lanzados;
-    statCancelados.textContent = cancelados;
-    statTotal.textContent = total;
-}
-
-function actualizarContador() {
-    contadorLanzamientos.textContent = lanzamientos.length;
-}
-
 
 
 // ─────────────────────────────────────────────────────────────────────────────
